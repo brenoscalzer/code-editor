@@ -1,5 +1,5 @@
 ## See the result
-See the current version at [https://breno-code-editor.herokuapp.com/](https://breno-code-editor.herokuapp.com/).
+See the current version at [https://brenoscalzer.github.io/code-editor/](https://brenoscalzer.github.io/code-editor/).
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
