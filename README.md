@@ -1,6 +1,8 @@
 ## See the result
 See the current version at [https://brenoscalzer.github.io/code-editor/](https://brenoscalzer.github.io/code-editor/).
 
+## The project
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
