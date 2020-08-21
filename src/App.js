@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import AceEditor from "react-ace";
-
-import "ace-builds/src-noconflict/mode-java";
 import Sidebar from './components/sidebar'
 import Footer from './components/footer'
 import Header from './components/header'
-import { getFiles, getFile } from './services/files'
-
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+import "ace-builds/src-noconflict/mode-java";
 import './app.css'
+
+import { getFiles, getFile, deleteFile, saveFile } from './services/files'
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function App() {
 
@@ -16,6 +21,9 @@ function App() {
   const [openedFiles, setOpenedFiles] = useState([{ name: 'NewFile.java', id: -1, content: '' }])
   const [screenWidth, setScreenWidth] = useState()
   const [tab, setTab] = useState(0)
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [errorOpen, setErrorOpen] = useState(false);
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     setScreenWidth(window.innerWidth)
@@ -25,41 +33,82 @@ function App() {
     getFiles().then(res => {
       setFiles(res.data)
     }).catch(err => {
-      alert('Error!', err.statusText)
+      setMessage('Error loading files')
+      setErrorOpen(true)
     })
   }, [])
+
+  const changeFile = (file, index, list) => {
+    const fileList = list || openedFiles
+    fileList[tab].content = code
+    setOpenedFiles(fileList)
+    setTab(index)
+    setCode(file.content)
+  }
 
   const openFile = (id) => {
     const opened = openedFiles.find(item => item.id === id)
     if (!opened) {
       getFile(id).then(res => {
-        setCode(res.data.content)
         const fileList = [
-          ...openedFiles,
+          ...(openedFiles.length > 1 || openedFiles[0].id !== -1 ? openedFiles : []),
           { name: res.data.name, id, content: res.data.content }
         ]
-        setOpenedFiles(fileList)
-        setTab(fileList.length - 1)
+        changeFile(res.data, fileList.length - 1, fileList)
       }).catch(err => {
-        alert('Error!', err.statusText)
+        setMessage('Error opening your file')
+        setErrorOpen(true)
       })
     } else {
-      console.log('hereee', opened)
-      setTab(openedFiles.findIndex(item => item.id === id))
-      setCode(opened.content)
+      changeFile(opened, openedFiles.findIndex(item => item.id === id))
     }
   }
 
-  const handleTabChange = (event, index) => {
-    setTab(index)
-    setCode(openedFiles[index].content)
+  const onDelete = async () => {
+    try {
+      await deleteFile(openedFiles[tab].id)
+      const result = await getFiles()
+      setFiles(result.data)
+      setMessage('File deleted successfully')
+      setSuccessOpen(true)
+    } catch (e) {
+      setMessage('Error deleting your file')
+      setErrorOpen(true)
+    }
   }
+
+  const onSave = async () => {
+    try {
+      const file = openedFiles[tab]
+      file.content = code
+      await saveFile(file)
+      setMessage('File saved successfully')
+      setSuccessOpen(true)
+    } catch (e) {
+      setMessage('Error saving your file')
+      setErrorOpen(true)
+    }
+  }
+
+  const handleErrorClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setErrorOpen(false);
+  };
+
+  const handleSuccessClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSuccessOpen(false);
+  };
 
   return (
     <div className="container">
       <Sidebar items={files} onSelect={openFile} />
       <div className="editor-container">
-        <Header value={tab} handleChange={handleTabChange} items={openedFiles} />
+        <Header value={tab} handleChange={(event, index) => changeFile(openedFiles[index], index)} items={openedFiles} />
         <AceEditor
           mode="java"
           onChange={setCode}
@@ -67,8 +116,18 @@ function App() {
           name="editor-div"
           editorProps={{ $blockScrolling: true, height: '100%' }}
         />
-        <Footer width={screenWidth || 0} />
+        <Footer width={screenWidth || 0} onCancel={onDelete} onConfirm={onSave} />
       </div>
+      <Snackbar open={successOpen} autoHideDuration={6000} onClose={handleSuccessClose}>
+        <Alert onClose={handleSuccessClose} severity="success">
+          {message}
+        </Alert>
+      </Snackbar>
+      <Snackbar open={errorOpen} autoHideDuration={6000} onClose={handleErrorClose}>
+        <Alert onClose={handleErrorClose} severity="error">
+          {message}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }

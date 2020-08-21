@@ -6,7 +6,7 @@
 .editor-container {
   display: inline-block;
   position: absolute;
-  left: 280px;
+  left: 300px;
   top: 0;
   height: 100%;
 }
@@ -14,4 +14,9 @@
 .ace_editor {
   height: calc(100% - 128px) !important;
   width: 100% !important;
+}
+
+.MuiAlert-root {
+  margin-top: -200px !important;
+  margin-left: 300px !important;
 }

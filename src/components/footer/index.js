@@ -3,11 +3,11 @@ import Button from '../button'
 
 import './style.css'
 
-function Footer({ onConfirm, onCancel, confirmText, cancelText, width }) {
+function Footer({ onConfirm, onCancel, width }) {
   return (
-    <div className="footer" style={{ width: width - 280 }}>
-      <Button label="Delete" type="secondary" />
-      <Button label="Save" type="primary" />
+    <div className="footer" style={{ width: width - 300 }}>
+      <Button label="Delete" type="secondary" onClick={onCancel} />
+      <Button label="Save" type="primary" onClick={onConfirm} />
     </div>
   )
 }

@@ -3,29 +3,47 @@ import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 import './style.css'
 
-function SidebarItem({ name, children, onSelect, depthStep = 10, depth = 0, isDirectory, ...rest }) {
+function SidebarItem({ name, children, onSelect, isDirectory, ...rest }) {
   return (
     <>
-      <ListItem button dense onClick={() => onSelect(rest.id)} {...rest}>
-        <ListItemText style={{ paddingLeft: depth * depthStep }}>
-          <span>{name}</span>
-        </ListItemText>
-      </ListItem>
-      {isDirectory ? (
-        <List disablePadding dense>
-          {children.map((subItem) => (
-            <SidebarItem
-              key={subItem.name}
-              depth={depth + 1}
-              depthStep={depthStep}
-              onSelect={onSelect}
-              {...subItem}
-            />
-          ))}
-        </List>
-      ) : null}
+    {
+      isDirectory ?
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
+          <Typography>
+            {name}
+          </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <List disablePadding dense>
+              {children.map((subItem) => (
+                <SidebarItem
+                  key={subItem.name}
+                  onSelect={onSelect}
+                  {...subItem}
+                />
+              ))}
+            </List>
+          </AccordionDetails>
+        </Accordion>
+      : <ListItem button dense onClick={() => onSelect(rest.id)} {...rest}>
+          <ListItemText>
+            <span>{name}</span>
+          </ListItemText>
+        </ListItem>
+    }
     </>
   )
 }

@@ -5,7 +5,7 @@ import './style.css'
 
 function Button({ onClick, label, type }) {
   return (
-    <Btn className="button" variant="contained" color={type}>
+    <Btn className="button" variant="contained" color={type} onClick={onClick}>
       {label}
     </Btn>
   )
