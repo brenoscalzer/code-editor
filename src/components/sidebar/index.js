@@ -5,10 +5,10 @@ import ListItemText from '@material-ui/core/ListItemText'
 
 import './style.css'
 
-function SidebarItem({ name, children, depthStep = 10, depth = 0, isDirectory, ...rest }) {
+function SidebarItem({ name, children, onSelect, depthStep = 10, depth = 0, isDirectory, ...rest }) {
   return (
     <>
-      <ListItem button dense {...rest}>
+      <ListItem button dense onClick={() => onSelect(rest.id)} {...rest}>
         <ListItemText style={{ paddingLeft: depth * depthStep }}>
           <span>{name}</span>
         </ListItemText>
@@ -20,6 +20,7 @@ function SidebarItem({ name, children, depthStep = 10, depth = 0, isDirectory, .
               key={subItem.name}
               depth={depth + 1}
               depthStep={depthStep}
+              onSelect={onSelect}
               {...subItem}
             />
           ))}
@@ -29,7 +30,7 @@ function SidebarItem({ name, children, depthStep = 10, depth = 0, isDirectory, .
   )
 }
 
-function Sidebar({ items, depthStep, depth }) {
+function Sidebar({ items, depthStep, depth, onSelect }) {
   return (
     <div className="sidebar">
       <List disablePadding dense>
@@ -38,6 +39,7 @@ function Sidebar({ items, depthStep, depth }) {
             key={`${sidebarItem.name}${index}`}
             depthStep={depthStep}
             depth={depth}
+            onSelect={onSelect}
             {...sidebarItem}
           />
         ))}
